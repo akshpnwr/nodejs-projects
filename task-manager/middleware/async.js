@@ -1,7 +1,7 @@
 const asyncWrapper = (resolveFunction) => {
     return async (req, res, next) => {
         try {
-            resolveFunction(req, res);
+            await resolveFunction(req, res, next);
         } catch (error) {
             next(error)
         }
