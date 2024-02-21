@@ -8,7 +8,7 @@ const populateDb = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
     const products = await Product.find()
-    res.status(200).json({ products })
+    res.status(200).json({ nbHits: products.length, products })
 }
 
 const getProduct = async (req, res) => {
@@ -24,8 +24,9 @@ const createProduct = async (req, res) => {
     res.status(200).json({ product })
 }
 
-const updateProduct = (req, res) => {
-    res.send('update product')
+const updateProduct = async (req, res) => {
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { runValidators: true, new: true });
+    res.status(200).json({ product })
 }
 
 const deleteProduct = async (req, res) => {

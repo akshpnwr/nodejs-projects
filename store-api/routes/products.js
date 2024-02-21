@@ -1,4 +1,6 @@
 const express = require('express')
+require('express-async-errors')
+
 const { getAllProducts, createProduct, updateProduct, deleteProduct, getProduct, populateDb } = require('../controllers/products')
 
 const router = express.Router()
