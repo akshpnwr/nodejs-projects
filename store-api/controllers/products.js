@@ -7,8 +7,30 @@ const populateDb = async (req, res) => {
 }
 
 const getAllProducts = async (req, res) => {
-    const { featured, name, company, sort, fields, limit, page } = req.query
+    const { featured, name, company, sort, fields, limit, page, numericFilters } = req.query
     const queryObject = {}
+
+    if (numericFilters) {
+
+        const operatorMap = {
+            '>': '$gt',
+            '<': '$lt',
+            '>=': '$gte',
+            '<=': '$lte',
+            '=': '$eq'
+        }
+
+        const regEx = /\b(<|>|<=|>=|=)\b/g
+        const filters = numericFilters.replace(regEx, match => `-${operatorMap[match]}-`)
+
+        const options = ['price', 'rating']
+
+        filters.split(',').forEach(filter => {
+            const [field, operator, value] = filter.split('-')
+            if (options.includes(field))
+                queryObject[field] = { [operator]: Number(value) }
+        })
+    }
 
     if (featured) {
         queryObject.featured = featured === 'true' ? true : false;
