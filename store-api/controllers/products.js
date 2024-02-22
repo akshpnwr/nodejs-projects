@@ -7,7 +7,7 @@ const populateDb = async (req, res) => {
 }
 
 const getAllProducts = async (req, res) => {
-    const { featured, name, company } = req.query
+    const { featured, name, company, sort, fields, limit, page } = req.query
     const queryObject = {}
 
     if (featured) {
@@ -20,7 +20,21 @@ const getAllProducts = async (req, res) => {
         queryObject.company = company
     }
 
-    const products = await Product.find(queryObject)
+    // sort
+    let sortList = 'createdAt';
+    if (sort) sortList = sort.split(',').join(' ')
+
+    // filter fields
+    let fieldsList = 'name price company rating featured createdAt';
+    if (fields) fieldsList = fields.split(',').join(' ')
+
+    const products = await Product
+        .find(queryObject)
+        .sort(sortList)
+        .select(fieldsList)
+        .limit(limit ? parseInt(limit) : 10)
+        .skip((parseInt(page) - 1) * parseInt(limit))
+
     res.status(200).json({ nbHits: products.length, products })
 }
 
