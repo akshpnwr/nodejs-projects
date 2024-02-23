@@ -1,5 +1,6 @@
 const express = require('express')
 const { getAllJobs, createJob, getJob, deleteJob, updateJob } = require('../controllers/jobs')
+require('express-async-errors')
 
 const router = express.Router()
 

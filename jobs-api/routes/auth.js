@@ -1,5 +1,6 @@
 const express = require('express');
 const { register, login } = require('../controllers/auth');
+require('express-async-errors')
 
 const router = express.Router();
 
