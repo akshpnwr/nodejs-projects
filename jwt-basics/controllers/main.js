@@ -16,12 +16,8 @@ const login = async (req, res) => {
 }
 
 const dashboard = async (req, res) => {
-    const authHeader = req.headers.authorization;
-
-    console.log(authHeader);
-
     const randomNumber = Math.floor(Math.random() * 100);
-    res.status(200).json({ msg: `Hello, John`, secret: `Your lucky number is : ${randomNumber}` });
+    res.status(200).json({ msg: `Hello, ${req.user.username}`, secret: `Your lucky number is : ${randomNumber}` });
 }
 
 module.exports = {
