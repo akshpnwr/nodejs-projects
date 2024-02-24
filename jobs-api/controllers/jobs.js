@@ -1,5 +1,7 @@
+const { StatusCodes } = require('http-status-codes')
+
 const getAllJobs = async (req, res) => {
-    res.send('get all jobs')
+    res.status(StatusCodes.OK).json(req.user)
 }
 
 const getJob = async (req, res) => {

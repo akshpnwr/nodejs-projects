@@ -1,6 +1,5 @@
-const { CustomAPIError } = require("../errors");
+const { UnauthenticatedError, BadRequestError } = require("../errors");
 const User = require("../models/User")
-const bcrypt = require('bcryptjs')
 const { StatusCodes } = require('http-status-codes')
 
 const register = async (req, res) => {
@@ -10,15 +9,21 @@ const register = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const { name, password } = req.body
-    const { password: hashedPassword } = await User.findOne({ name })
+    const { email, password } = req.body
 
-    const match = await bcrypt.compare(password, hashedPassword)
+    if (!email || !password) throw new BadRequestError('Please provide email and password')
 
-    if (!match) throw new CustomAPIError('Invalid credentials')
+    const user = await User.findOne({ email })
 
-    res.status(200).json({ msg: 'logged in' })
+    if (!user) throw new UnauthenticatedError('Invalid credentials')
 
+    const token = user.createJWT()
+
+    const isPasswordCorrect = await user.comparePassword(password)
+
+    if (!isPasswordCorrect) throw new UnauthenticatedError('Invalid credentials')
+
+    res.status(StatusCodes.OK).json({ user: { name: user.name }, token })
 }
 
 module.exports = { register, login }
