@@ -1,12 +1,19 @@
 const { StatusCodes } = require('http-status-codes')
 const Job = require('../models/Job')
+const { NotFoundError } = require('../errors')
 
 const getAllJobs = async (req, res) => {
-    res.status(StatusCodes.OK).json(req.user)
+    const jobs = await Job.find({ createdBy: req.user.userId })
+    res.status(StatusCodes.OK).json({ count: jobs.length, jobs })
 }
 
 const getJob = async (req, res) => {
-    res.send('get job')
+    const { user: { userId }, params: { id: jobId } } = req
+    const job = await Job.findOne({ _id: jobId, createdBy: userId })
+
+    if (!job) throw new NotFoundError(`No job with ID ${jobId}`)
+
+    res.status(StatusCodes.OK).json({ job })
 }
 
 const createJob = async (req, res) => {
@@ -16,11 +23,21 @@ const createJob = async (req, res) => {
 }
 
 const deleteJob = async (req, res) => {
-    res.send('delete job')
+    const job = await Job.findOneAndDelete({ _id: req.params.id })
+
+    if (!job) throw new NotFoundError(`No job with ID ${req.params.id}`)
+
+    res.status(StatusCodes.OK).json({ job })
 }
 
 const updateJob = async (req, res) => {
-    res.send('update job')
+    const job = await Job.findOneAndUpdate({ _id: req.params.id }, req.body, {
+        new: true,
+        runValidators: true
+    })
+
+    if (!job) throw new NotFoundError(`No job with ID ${req.params.id}`)
+    res.status(StatusCodes.OK).json({ job })
 }
 
 module.exports = {
